@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RPE Post-séance — U13 Limoges Football</title>
+<style>
+  :root{
+    --fond:#0f1115;
+    --panneau:#1a1d24;
+    --panneau-clair:#22262f;
+    --texte:#eef0f3;
+    --texte-att:#9aa0ad;
+    --ligne:#2c303a;
+    --bleu:#4a7dd6;
+    --c1:#3a9d5a;
+    --c2:#5aad6a;
+    --c3:#8fc43a;
+    --c4:#c4c43a;
+    --c5:#d4a82e;
+    --c6:#d4841f;
+    --c7:#d4611f;
+    --c8:#c4391f;
+    --c9:#b42515;
+    --c10:#8a1010;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--fond);
+    color:var(--texte);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    min-height:100vh;
+  }
+  .wrap{max-width:560px;margin:0 auto;padding:20px 18px 60px;}
+
+  .header{text-align:center;margin-bottom:22px;padding-top:10px;}
+  .header .tag{
+    display:inline-block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--texte-att);border:1px solid var(--ligne);border-radius:999px;padding:4px 12px;margin-bottom:10px;
+  }
+  .header h1{font-size:26px;font-weight:700;margin:0 0 4px;letter-spacing:-0.01em;}
+  .header p{font-size:14px;color:var(--texte-att);margin:0;}
+  .header .date{font-size:13px;color:var(--texte-att);margin-top:6px;text-transform:capitalize;}
+
+  .panneau{background:var(--panneau);border:1px solid var(--ligne);border-radius:18px;padding:20px;}
+
+  .champ-nom{margin-bottom:20px;}
+  .champ-nom label{display:block;font-size:13px;color:var(--texte-att);margin-bottom:8px;}
+  .champ-nom select{
+    width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--ligne);
+    background:var(--panneau-clair);color:var(--texte);font-size:16px;appearance:none;
+  }
+
+  .rpe-zone{margin-bottom:20px;}
+  .rpe-zone label{display:block;font-size:13px;color:var(--texte-att);margin-bottom:12px;}
+
+  .rpe-grille{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px;}
+  .rpe-btn{
+    aspect-ratio:1;border-radius:14px;border:2px solid var(--ligne);background:var(--panneau-clair);
+    color:var(--texte);font-size:20px;font-weight:800;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .08s ease, border-color .1s ease;
+  }
+  .rpe-btn:active{transform:scale(0.94);}
+  .rpe-btn.n1.selected{border-color:var(--c1);background:rgba(58,157,90,.2);color:var(--c1);}
+  .rpe-btn.n2.selected{border-color:var(--c2);background:rgba(90,173,106,.2);color:var(--c2);}
+  .rpe-btn.n3.selected{border-color:var(--c3);background:rgba(143,196,58,.2);color:var(--c3);}
+  .rpe-btn.n4.selected{border-color:var(--c4);background:rgba(196,196,58,.2);color:var(--c4);}
+  .rpe-btn.n5.selected{border-color:var(--c5);background:rgba(212,168,46,.2);color:var(--c5);}
+  .rpe-btn.n6.selected{border-color:var(--c6);background:rgba(212,132,31,.2);color:var(--c6);}
+  .rpe-btn.n7.selected{border-color:var(--c7);background:rgba(212,97,31,.2);color:var(--c7);}
+  .rpe-btn.n8.selected{border-color:var(--c8);background:rgba(196,57,31,.2);color:var(--c8);}
+  .rpe-btn.n9.selected{border-color:var(--c9);background:rgba(180,37,21,.2);color:var(--c9);}
+  .rpe-btn.n10.selected{border-color:var(--c10);background:rgba(138,16,16,.2);color:var(--c10);}
+
+  .rpe-legende{
+    display:flex;justify-content:space-between;
+    font-size:11.5px;color:var(--texte-att);margin-top:4px;
+  }
+
+  .rpe-description{
+    display:none;
+    background:var(--panneau-clair);border:1px solid var(--ligne);border-radius:12px;
+    padding:12px 14px;font-size:13.5px;line-height:1.5;margin-top:12px;
+    text-align:center;
+  }
+  .rpe-description.show{display:block;}
+
+  .valider{
+    margin-top:18px;width:100%;padding:15px;border-radius:14px;border:none;
+    background:var(--bleu);color:#fff;font-size:16px;font-weight:700;cursor:pointer;
+  }
+  .valider:disabled{background:#3a3e48;color:#7a7e88;cursor:not-allowed;}
+  .valider:active:not(:disabled){transform:scale(0.98);}
+
+  .erreur{
+    display:none;background:rgba(196,57,47,.12);border:1px solid rgba(196,57,47,.4);
+    color:#e8a39d;font-size:13px;padding:12px 14px;border-radius:12px;margin-top:14px;line-height:1.5;
+  }
+
+  .confirmation{display:none;text-align:center;padding:30px 10px;}
+  .confirmation .grand-num{
+    font-size:72px;font-weight:800;margin-bottom:8px;display:block;line-height:1;
+  }
+  .confirmation h2{font-size:19px;margin:0 0 6px;}
+  .confirmation p{color:var(--texte-att);font-size:14px;margin:0 0 22px;line-height:1.5;}
+  .confirmation .nouveau{
+    background:none;border:1px solid var(--ligne);color:var(--texte);
+    padding:11px 20px;border-radius:12px;font-size:14px;cursor:pointer;
+  }
+
+  /* DASHBOARD */
+  .toggle-zone{margin-top:26px;text-align:center;}
+  .toggle-btn{background:none;border:1px solid var(--ligne);color:var(--texte-att);font-size:13px;padding:9px 18px;border-radius:999px;cursor:pointer;}
+
+  .dashboard{display:none;margin-top:22px;}
+  .dashboard.show{display:block;}
+
+  .nav-jour{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;}
+  .nav-jour button{background:var(--panneau-clair);border:1px solid var(--ligne);color:var(--texte);width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:16px;}
+  .nav-jour .jour-actuel{flex:1;text-align:center;font-size:14px;font-weight:700;text-transform:capitalize;}
+
+  .dash-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
+  .dash-head h2{font-size:16px;margin:0;}
+  .dash-head .count{font-size:13px;color:var(--texte-att);}
+
+  .dash-loading{text-align:center;color:var(--texte-att);font-size:13px;padding:24px;}
+  .dash-empty{text-align:center;color:var(--texte-att);font-size:14px;padding:30px;border:1px dashed var(--ligne);border-radius:14px;}
+
+  .rpe-ligne{
+    display:flex;align-items:center;gap:10px;background:var(--panneau);border:1px solid var(--ligne);
+    border-radius:12px;padding:10px 12px;margin-bottom:6px;
+  }
+  .rpe-ligne .badge{
+    width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    font-size:15px;font-weight:800;flex-shrink:0;
+  }
+  .rpe-ligne .nom{flex:1;font-size:14.5px;font-weight:600;}
+  .rpe-ligne .heure{font-size:11.5px;color:var(--texte-att);}
+
+  .moyenne-zone{
+    background:var(--panneau-clair);border:1px solid var(--ligne);border-radius:14px;
+    padding:14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;
+  }
+  .moyenne-zone .label{font-size:13px;color:var(--texte-att);}
+  .moyenne-zone .chiffre{font-size:28px;font-weight:800;}
+
+  .dash-actions{display:flex;gap:10px;margin-top:14px;}
+  .dash-actions button{flex:1;background:var(--panneau);border:1px solid var(--ligne);color:var(--texte-att);padding:10px;border-radius:10px;font-size:13px;cursor:pointer;}
+
+  .footer-note{text-align:center;color:var(--texte-att);font-size:11.5px;margin-top:26px;line-height:1.5;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <span class="tag">Fin de séance · U13 Limoges Football</span>
+    <h1>Comment était l'entraînement ?</h1>
+    <p>Donne une note honnête sur l'intensité physique ressentie</p>
+    <div class="date" id="dateAffichee"></div>
+  </div>
+
+  <div class="panneau" id="ecranSaisie">
+    <div class="champ-nom">
+      <label for="selectJoueur">Ton prénom</label>
+      <select id="selectJoueur">
+        <option value="">— Sélectionne ton prénom —</option>
+      </select>
+    </div>
+
+    <div class="rpe-zone">
+      <label>Niveau de difficulté ressenti (1 = très facile · 10 = épuisant)</label>
+      <div class="rpe-grille" id="rpeGrille">
+        <button class="rpe-btn n1" data-n="1" data-desc="Trop simple — du football loisir, aucun effort physique.">1</button>
+        <button class="rpe-btn n2" data-n="2" data-desc="Très facile — quelques exercices légers, pas de fatigue.">2</button>
+        <button class="rpe-btn n3" data-n="3" data-desc="Facile — un peu de mouvement mais ça restait confortable.">3</button>
+        <button class="rpe-btn n4" data-n="4" data-desc="Plutôt facile — quelques efforts mais bien récupéré.">4</button>
+        <button class="rpe-btn n5" data-n="5" data-desc="Moyen — certains moments fatigants, d'autres plus simples.">5</button>
+        <button class="rpe-btn n6" data-n="6" data-desc="Un peu intense — plus de moments difficiles que faciles.">6</button>
+        <button class="rpe-btn n7" data-n="7" data-desc="Intense — beaucoup d'effort, quelques moments de récupération.">7</button>
+        <button class="rpe-btn n8" data-n="8" data-desc="Très intense — difficile tout au long, il fallait se battre.">8</button>
+        <button class="rpe-btn n9" data-n="9" data-desc="Extrêmement intense — presque tout le temps à fond.">9</button>
+        <button class="rpe-btn n10" data-n="10" data-desc="Épuisant — c'était trop intense, je suis sur les rotules.">10</button>
+      </div>
+      <div class="rpe-legende">
+        <span>⬡ Très facile</span>
+        <span>⬡ Épuisant</span>
+      </div>
+      <div class="rpe-description" id="rpeDescription"></div>
+    </div>
+
+    <button class="valider" id="btnValider" disabled>Valider ma note</button>
+    <div class="erreur" id="zoneErreur"></div>
+  </div>
+
+  <div class="confirmation" id="ecranConfirmation">
+    <span class="grand-num" id="confNum" style="color:var(--bleu);">5</span>
+    <h2 id="confTitre">Merci !</h2>
+    <p id="confDesc"></p>
+    <button class="nouveau" id="btnNouveau">Joueur suivant</button>
+  </div>
+
+  <div class="toggle-zone">
+    <button class="toggle-btn" id="btnToggleDash">Voir le tableau de bord coach</button>
+  </div>
+
+  <div class="dashboard" id="dashboard">
+    <div class="nav-jour">
+      <button id="jourPrecedent">‹</button>
+      <div class="jour-actuel" id="jourActuelTxt">aujourd'hui</div>
+      <button id="jourSuivant">›</button>
+    </div>
+    <div class="dash-head">
+      <h2>RPE post-séance</h2>
+      <span class="count" id="dashCount">—</span>
+    </div>
+    <div id="dashContenu"><div class="dash-loading">Chargement…</div></div>
+    <div class="dash-actions">
+      <button id="btnRafraichir">Actualiser</button>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Les notes sont enregistrées dans votre Google Sheet et visibles depuis n'importe quel appareil.
+  </div>
+
+</div>
+
+<script>
+(function(){
+
+  var URL_SCRIPT = "https://script.google.com/macros/s/AKfycbxpcsBjwqNDR7LkbT53krZK2d29iQlDzpOUovqD2FCnEGHjENNWE6orj6upb7PtHrLo/exec";
+
+  var EFFECTIF = ["Hadi","Sebastien","Mickaël","Bakoutoubo","Sacha","Keys","Nourou","Yanis","Mathis","Ethan","Abdoul Karim","Jalil","Gabin","Adam","Kalifa","Bilel","Pablo","Melih","Issam","Emir","Loan","Sarah"];
+
+  var COULEURS = {1:"#3a9d5a",2:"#5aad6a",3:"#8fc43a",4:"#c4c43a",5:"#d4a82e",6:"#d4841f",7:"#d4611f",8:"#c4391f",9:"#b42515",10:"#8a1010"};
+
+  var CODE_PIN_COACH = "0501";
+  var STORAGE_SESSION_COACH = "rpe_post_coach";
+
+  // Date
+  var moisFr = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+  var joursFr = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+  function formatDateLisible(d){ return joursFr[d.getDay()]+" "+d.getDate()+" "+moisFr[d.getMonth()]; }
+  function clefISO(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+
+  document.getElementById("dateAffichee").textContent = formatDateLisible(new Date());
+
+  // Select joueurs
+  var selectJoueur = document.getElementById("selectJoueur");
+  EFFECTIF.forEach(function(nom){
+    var o = document.createElement("option");
+    o.value = nom; o.textContent = nom;
+    selectJoueur.appendChild(o);
+  });
+
+  // Sélection RPE
+  var rpeChoisi = null;
+  var btnValider = document.getElementById("btnValider");
+  var rpeDescription = document.getElementById("rpeDescription");
+
+  function verifier(){ btnValider.disabled = !(selectJoueur.value && rpeChoisi); }
+  selectJoueur.addEventListener("change", verifier);
+
+  document.querySelectorAll(".rpe-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll(".rpe-btn").forEach(function(b){ b.classList.remove("selected"); });
+      btn.classList.add("selected");
+      rpeChoisi = parseInt(btn.getAttribute("data-n"), 10);
+      rpeDescription.textContent = btn.getAttribute("data-desc");
+      rpeDescription.classList.add("show");
+      verifier();
+    });
+  });
+
+  // Envoi
+  var ecranSaisie = document.getElementById("ecranSaisie");
+  var ecranConfirmation = document.getElementById("ecranConfirmation");
+  var zoneErreur = document.getElementById("zoneErreur");
+
+  btnValider.addEventListener("click", function(){
+    if(!selectJoueur.value || !rpeChoisi) return;
+    zoneErreur.style.display = "none";
+    btnValider.disabled = true;
+    btnValider.textContent = "Envoi…";
+
+    fetch(URL_SCRIPT, {
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body: JSON.stringify({type:"rpe_post", nom:selectJoueur.value, rpe:rpeChoisi})
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(){
+      var couleur = COULEURS[rpeChoisi];
+      document.getElementById("confNum").textContent = rpeChoisi;
+      document.getElementById("confNum").style.color = couleur;
+      document.getElementById("confTitre").textContent = "Merci "+selectJoueur.value+" !";
+      document.getElementById("confDesc").textContent = document.querySelector(".rpe-btn.selected").getAttribute("data-desc");
+      ecranSaisie.style.display = "none";
+      ecranConfirmation.style.display = "block";
+    })
+    .catch(function(err){
+      zoneErreur.style.display = "block";
+      zoneErreur.textContent = "Envoi impossible. Vérifie la connexion internet et réessaie.";
+      btnValider.disabled = false;
+      btnValider.textContent = "Valider ma note";
+    });
+  });
+
+  document.getElementById("btnNouveau").addEventListener("click", function(){
+    ecranConfirmation.style.display = "none";
+    ecranSaisie.style.display = "block";
+    rpeChoisi = null;
+    document.querySelectorAll(".rpe-btn").forEach(function(b){ b.classList.remove("selected"); });
+    rpeDescription.classList.remove("show");
+    selectJoueur.value = "";
+    btnValider.textContent = "Valider ma note";
+    verifier();
+  });
+
+  // Dashboard coach
+  var dashboard = document.getElementById("dashboard");
+  var btnToggleDash = document.getElementById("btnToggleDash");
+  var toutesLesDonnees = null;
+  var jourAffiche = new Date();
+
+  btnToggleDash.addEventListener("click", function(){
+    var dejaOuvert = dashboard.classList.contains("show");
+    if(dejaOuvert){
+      dashboard.classList.remove("show");
+      btnToggleDash.textContent = "Voir le tableau de bord coach";
+      return;
+    }
+    var deverrouille = sessionStorage.getItem(STORAGE_SESSION_COACH) === "1";
+    if(!deverrouille){
+      var saisie = prompt("Code coach (4 chiffres) :");
+      if(saisie === null) return;
+      if(saisie.trim() !== CODE_PIN_COACH){ alert("Code incorrect."); return; }
+      sessionStorage.setItem(STORAGE_SESSION_COACH, "1");
+    }
+    dashboard.classList.add("show");
+    btnToggleDash.textContent = "Masquer le tableau de bord";
+    chargerDonnees();
+  });
+
+  document.getElementById("btnRafraichir").addEventListener("click", chargerDonnees);
+
+  function chargerDonnees(){
+    document.getElementById("dashContenu").innerHTML = '<div class="dash-loading">Chargement…</div>';
+    fetch(URL_SCRIPT+"?type=rpe_post")
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        toutesLesDonnees = data;
+        afficherJour();
+      })
+      .catch(function(){
+        document.getElementById("dashContenu").innerHTML = '<div class="dash-empty">Impossible de charger les données.</div>';
+      });
+  }
+
+  document.getElementById("jourPrecedent").addEventListener("click", function(){
+    jourAffiche.setDate(jourAffiche.getDate()-1);
+    afficherJour();
+  });
+  document.getElementById("jourSuivant").addEventListener("click", function(){
+    jourAffiche.setDate(jourAffiche.getDate()+1);
+    afficherJour();
+  });
+
+  function afficherJour(){
+    if(!toutesLesDonnees) return;
+    var estAujourdhui = clefISO(jourAffiche) === clefISO(new Date());
+    document.getElementById("jourActuelTxt").textContent = estAujourdhui ? "aujourd'hui" : formatDateLisible(new Date(jourAffiche));
+
+    var clef = clefISO(jourAffiche);
+    var reponses = toutesLesDonnees.filter(function(r){ return r.date === clef; });
+    document.getElementById("dashCount").textContent = reponses.length+(reponses.length===1?" réponse":" réponses");
+
+    var conteneur = document.getElementById("dashContenu");
+    if(reponses.length === 0){
+      conteneur.innerHTML = '<div class="dash-empty">Aucune note ce jour-là.</div>';
+      return;
+    }
+
+    // Moyenne
+    var somme = 0;
+    reponses.forEach(function(r){ somme += parseInt(r.rpe,10); });
+    var moy = (somme/reponses.length).toFixed(1);
+    var couleurMoy = COULEURS[Math.round(somme/reponses.length)];
+
+    var html = '<div class="moyenne-zone">';
+    html += '<span class="label">RPE moyen de l\'équipe</span>';
+    html += '<span class="chiffre" style="color:'+couleurMoy+'">'+moy+' / 10</span>';
+    html += '</div>';
+
+    // Tri par RPE décroissant
+    reponses.sort(function(a,b){ return parseInt(b.rpe,10)-parseInt(a.rpe,10); });
+
+    reponses.forEach(function(r){
+      var c = COULEURS[parseInt(r.rpe,10)] || "#9aa0ad";
+      html += '<div class="rpe-ligne">';
+      html += '<div class="badge" style="background:'+c+'22;color:'+c+';border:1.5px solid '+c+'">'+r.rpe+'</div>';
+      html += '<span class="nom">'+escapeHTML(r.nom)+'</span>';
+      html += '<span class="heure">'+escapeHTML(r.heure)+'</span>';
+      html += '</div>';
+    });
+
+    conteneur.innerHTML = html;
+  }
+
+  function escapeHTML(s){ var d=document.createElement("div");d.textContent=s;return d.innerHTML; }
+
+})();
+</script>
+</body>
+</html>
